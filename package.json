@@ -1,0 +1,34 @@
+{
+  "name": "transcript",
+  "version": "1.0.0",
+  "description": "Ferramenta CLI para converter, transcrever e analisar gravações de chamadas",
+  "license": "MIT",
+  "author": {
+    "name": "Kelvyn Krug",
+    "email": "kelvynkrug@gmail.com",
+    "url": "http://linkedin.com/in/kelvynkrug"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "convert": "tsx src/cli.ts convert",
+    "transcribe": "tsx src/cli.ts transcribe",
+    "analyze": "tsx src/cli.ts analyze",
+    "convert:transcribe": "tsx src/cli.ts convert-transcribe",
+    "transcribe:analyze": "tsx src/cli.ts transcribe-analyze",
+    "full": "tsx src/cli.ts full"
+  },
+  "dependencies": {
+    "commander": "^13.0.0",
+    "dotenv": "^16.4.0",
+    "fluent-ffmpeg": "^2.1.3",
+    "groq-sdk": "^1.1.1",
+    "openai": "^6.31.0"
+  },
+  "devDependencies": {
+    "@types/fluent-ffmpeg": "^2.1.27",
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

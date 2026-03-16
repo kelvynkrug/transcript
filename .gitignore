@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+output/
+.chunks/
+.claude
+CLAUDE.md
+package-lock.json
+yarn.lock
