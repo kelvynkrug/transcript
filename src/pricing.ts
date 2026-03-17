@@ -9,10 +9,11 @@ const TOKENS_PER_MILLION = 1_000_000;
 
 // Fontes: https://groq.com/pricing/ | https://openai.com/api/pricing/
 
-// Groq — transcrição (USD por hora de áudio)
+// Transcrição (USD por hora de áudio)
 const transcriptionModels: Record<string, number> = {
-  'whisper-large-v3': 0.111,
-  'whisper-large-v3-turbo': 0.04,
+  'whisper-large-v3': 0.111, // Groq
+  'whisper-large-v3-turbo': 0.04, // Groq
+  'whisper-1': 0.36, // OpenAI
 };
 
 // OpenAI — análise (USD por 1M tokens: [input, output])

@@ -1,4 +1,4 @@
-import { writeFileSync, mkdirSync } from 'fs';
+import { copyFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join, basename, extname, resolve } from 'path';
 import { convertToMp3 } from './converter.js';
 import { transcribe, type TranscriptionResult } from './transcriber.js';
@@ -15,6 +15,7 @@ import {
   appendToGlobalCosts,
   type CostEntry,
 } from './cost-tracker.js';
+import { createNotebook } from './notebooklm.js';
 
 export interface ProcessResult {
   input_file: string;
@@ -28,8 +29,10 @@ export async function process(options: {
   transcriptionModel?: string;
   analysisModel?: string;
   outputDir?: string;
+  notebookProfile?: string;
 }): Promise<ProcessResult> {
-  const { analysisPrompt, transcriptionModel, analysisModel } = options;
+  const { analysisPrompt, transcriptionModel, analysisModel, notebookProfile } =
+    options;
   const inputFile = resolve(options.inputFile);
   const fileName = basename(inputFile, extname(inputFile));
   const cwd = globalThis.process.cwd();
@@ -51,6 +54,8 @@ export async function process(options: {
   console.log(`Saída: ${outputDir}`);
 
   const mp3Path = await convertToMp3(inputFile);
+
+  copyFileSync(mp3Path, join(outputDir, basename(mp3Path)));
 
   const tModel = transcriptionModel || config.transcriptionModel;
   console.log(`Transcrevendo com ${tModel}...`);
@@ -133,6 +138,21 @@ export async function process(options: {
 
   printCostSummary(costEntry, usdBrl);
   console.log(`\nResultados salvos em: ${outputDir}`);
+
+  if (notebookProfile) {
+    const sources = [
+      join(outputDir, basename(mp3Path)),
+      join(outputDir, 'transcription.md'),
+    ];
+    if (result.analysis) {
+      sources.push(join(outputDir, 'analysis.md'));
+    }
+    try {
+      await createNotebook(notebookProfile, fileName, sources);
+    } catch (err) {
+      console.error(`\nErro ao criar notebook: ${(err as Error).message}`);
+    }
+  }
 
   return result;
 }

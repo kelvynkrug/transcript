@@ -3,11 +3,23 @@ import { dirname, join } from 'path';
 import { execSync } from 'child_process';
 import { readdirSync } from 'fs';
 import Groq from 'groq-sdk';
+import OpenAI from 'openai';
 import { config } from './config.js';
 
 const groq = new Groq({ apiKey: config.groqApiKey });
+const openai = new OpenAI({ apiKey: config.openaiApiKey });
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024;
+
+const OPENAI_MODELS = ['whisper-1'];
+
+function isOpenAIModel(model: string): boolean {
+  return OPENAI_MODELS.includes(model);
+}
+
+function getClient(model: string) {
+  return isOpenAIModel(model) ? openai : groq;
+}
 
 export interface TranscriptionResult {
   text: string;
@@ -31,7 +43,8 @@ export async function transcribe(
     return transcribeChunks(audioPath, aiModel);
   }
 
-  const response = await groq.audio.transcriptions.create({
+  const client = getClient(aiModel);
+  const response = await client.audio.transcriptions.create({
     file: createReadStream(audioPath),
     model: aiModel,
     response_format: 'verbose_json',
@@ -73,6 +86,7 @@ async function transcribeChunks(
     .sort()
     .map((f) => join(chunkDir, f));
 
+  const client = getClient(model);
   const allText: string[] = [];
   const allSegments: Record<string, unknown>[] = [];
   let language: string | null = null;
@@ -81,7 +95,7 @@ async function transcribeChunks(
   for (let i = 0; i < chunks.length; i++) {
     console.log(`  Transcrevendo parte ${i + 1}/${chunks.length}...`);
 
-    const response = await groq.audio.transcriptions.create({
+    const response = await client.audio.transcriptions.create({
       file: createReadStream(chunks[i]),
       model,
       response_format: 'verbose_json',
