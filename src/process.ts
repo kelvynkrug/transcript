@@ -128,12 +128,12 @@ export async function process(options: {
 
   const usdBrl = await getUsdToBrl();
 
-  const dateStr = new Date(costEntry.timestamp).toLocaleString('pt-BR', {
+  const costDateStr = new Date(costEntry.timestamp).toLocaleString('pt-BR', {
     timeZone: 'America/Sao_Paulo',
   });
   writeFileSync(
     join(outputDir, 'costs.md'),
-    header('Custos') + formatEntryCostMarkdown(costEntry, usdBrl, dateStr),
+    header('Custos') + formatEntryCostMarkdown(costEntry, usdBrl, costDateStr),
     'utf-8',
   );
 
