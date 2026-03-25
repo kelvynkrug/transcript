@@ -1,7 +1,8 @@
 import { createReadStream, statSync, mkdirSync, rmSync, unlinkSync } from 'fs';
-import { dirname, join } from 'path';
+import { dirname, join, basename } from 'path';
 import { execSync } from 'child_process';
 import { readdirSync } from 'fs';
+import { randomBytes } from 'crypto';
 import Groq from 'groq-sdk';
 import OpenAI from 'openai';
 import { config } from './config.js';
@@ -71,7 +72,8 @@ async function transcribeChunks(
   audioPath: string,
   model: string,
 ): Promise<TranscriptionResult> {
-  const chunkDir = join(dirname(audioPath), '.chunks');
+  const suffix = randomBytes(4).toString('hex');
+  const chunkDir = join(dirname(audioPath), `.chunks-${basename(audioPath, '.mp3')}-${suffix}`);
   mkdirSync(chunkDir, { recursive: true });
 
   const chunkPattern = join(chunkDir, 'chunk_%03d.mp3');
